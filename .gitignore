@@ -1,0 +1,8 @@
+# Mac Directory #
+.DS_Store
+
+# Vagrant #
+.vagrant
+
+# Berks
+Berksfile.lock

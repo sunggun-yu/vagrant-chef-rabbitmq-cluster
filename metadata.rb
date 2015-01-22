@@ -1,0 +1,7 @@
+name             'vagrant-chef-rabbitmq-cluster'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures vagrant-chef-rabbitmq-cluster'
+long_description 'Installs/Configures vagrant-chef-rabbitmq-cluster'
+version          '0.1.0'
