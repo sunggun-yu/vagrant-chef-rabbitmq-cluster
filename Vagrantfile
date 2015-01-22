@@ -91,14 +91,11 @@ Vagrant.configure('2') do |config|
     rabbit2.vm.network :private_network, ip: '10.211.11.101'
     rabbit2.vm.hostname = 'rabbit2'
     rabbit2.vm.provision :hostmanager
-
-    rabbit2.vm.provision 'shell', run: 'once' do |s|
-      s.inline = 'rabbitmqctl stop_app'
-      s.inline = 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
-      s.inline = 'rabbitmqctl change_cluster_node_type disc'
-      s.inline = 'rabbitmqctl start_app'
-      s.inline = 'echo `rabbitmqctl cluster_status`'
-    end
+    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl stop_app'
+    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
+    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl change_cluster_node_type disc'
+    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl start_app'
+    rabbit2.vm.provision 'shell', inline: 'echo `rabbitmqctl cluster_status`'
   end
 
   config.vm.define :rabbit3 do |rabbit3|
@@ -110,13 +107,11 @@ Vagrant.configure('2') do |config|
     rabbit3.vm.network :private_network, ip: '10.211.11.102'
     rabbit3.vm.hostname = 'rabbit3'
     rabbit3.vm.provision :hostmanager
-    rabbit3.vm.provision 'shell', run: 'once' do |s|
-      s.inline = 'rabbitmqctl stop_app'
-      s.inline = 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
-      s.inline = 'rabbitmqctl change_cluster_node_type disc'
-      s.inline = 'rabbitmqctl start_app'
-      s.inline = 'echo `rabbitmqctl cluster_status`'
-    end
+    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl stop_app'
+    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
+    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl change_cluster_node_type disc'
+    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl start_app'
+    rabbit3.vm.provision 'shell', inline: 'echo `rabbitmqctl cluster_status`'
   end
 
 end
