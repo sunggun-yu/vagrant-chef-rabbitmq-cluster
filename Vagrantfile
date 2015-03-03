@@ -11,7 +11,7 @@ Vagrant.configure('2') do |config|
   config.vm.box = 'ubuntu/trusty64'
 
   # Manage /etc/hosts on host and VMs
-  config.hostmanager.enabled = false
+  config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.include_offline = true
   config.hostmanager.ignore_private_ip = false
@@ -22,96 +22,51 @@ Vagrant.configure('2') do |config|
 
   config.berkshelf.enabled = true
 
-  config.vm.provision 'chef_solo' do |chef|
-    chef.json = {
-        'rabbitmq' => {
-            'erlang_cookie' => 'EKTHGEVXEMYWBKFAKSKJ',
-            'cluster' => true,
-            'cluster_disk_nodes' => [
-                'rabbit@rabbit1',
-                'rabbit@rabbit2',
-                'rabbit@rabbit3'],
-            'policies' => {
-                'ha-all' => {
-                    'pattern' => '^(?!amq\\.).*',
-                    'params' => {
-                        'ha-mode' => 'all',
-                        'ha-sync-mode' => 'automatic'
-                    },
-                    'priority' => 0
-                },
-                'ha-two' => nil
-            },
-            'enabled_plugins' => [
-                'rabbitmq_management',
-                'rabbitmq_management_visualiser'
-            ],
-            'enabled_users' => [
-                {
-                    :name => 'admin',
-                    :password => 'admin',
-                    :tag => 'administrator',
-                    :rights =>[
-                        {
-                            :vhost => '/',
-                            :conf => '.*',
-                            :write => '.*',
-                            :read => '.*'
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-    chef.run_list = [
-        'recipe[rabbitmq::default]',
-        'recipe[rabbitmq::user_management]',
-        'recipe[rabbitmq::policy_management]',
-        'recipe[rabbitmq::plugin_management]',
-        'recipe[rabbitmq::mgmt_console]'
-    ]
-  end
-
   config.vm.define :rabbit1 do |rabbit1|
-    rabbit1.vm.provider :virtualbox do |v|
-      v.name = 'rabbit1'
-      v.customize ['modifyvm', :id, '--memory', '1024']
-    end
     rabbit1.vm.network :private_network, ip: '10.211.11.100'
     rabbit1.vm.hostname = 'rabbit1'
     rabbit1.vm.provision :hostmanager
+    rabbit1.vm.provision 'chef_solo' do |chef|
+      chef.roles_path = 'roles'
+      chef.add_role('rabbitmq')
+      chef.add_role('rabbitmq_master')
+    end
   end
 
   config.vm.define :rabbit2 do |rabbit2|
-    rabbit2.vm.box = 'ubuntu/trusty64'
-    rabbit2.vm.provider :virtualbox do |v|
-      v.name = 'rabbit2'
-      v.customize ['modifyvm', :id, '--memory', '1024']
-    end
     rabbit2.vm.network :private_network, ip: '10.211.11.101'
     rabbit2.vm.hostname = 'rabbit2'
     rabbit2.vm.provision :hostmanager
-    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl stop_app'
-    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
-    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl change_cluster_node_type disc'
-    rabbit2.vm.provision 'shell', inline: 'rabbitmqctl start_app'
-    rabbit2.vm.provision 'shell', inline: 'echo `rabbitmqctl cluster_status`'
+    rabbit2.vm.provision 'chef_solo' do |chef|
+      chef.roles_path = 'roles'
+      chef.json = {
+          'rabbitmq' => {
+              'clustering' => {
+                  'cluster_node_type' => 'ram'
+              }
+          }
+      }
+      chef.add_role('rabbitmq')
+      chef.add_role('rabbitmq_slave')
+    end
   end
 
   config.vm.define :rabbit3 do |rabbit3|
-    rabbit3.vm.box = 'ubuntu/trusty64'
-    rabbit3.vm.provider :virtualbox do |v|
-      v.name = 'rabbit3'
-      v.customize ['modifyvm', :id, '--memory', '1024']
-    end
     rabbit3.vm.network :private_network, ip: '10.211.11.102'
     rabbit3.vm.hostname = 'rabbit3'
     rabbit3.vm.provision :hostmanager
-    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl stop_app'
-    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl join_cluster --ram rabbit@rabbit1'
-    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl change_cluster_node_type disc'
-    rabbit3.vm.provision 'shell', inline: 'rabbitmqctl start_app'
-    rabbit3.vm.provision 'shell', inline: 'echo `rabbitmqctl cluster_status`'
+    rabbit3.vm.provision 'chef_solo' do |chef|
+      chef.roles_path = 'roles'
+      chef.json = {
+          'rabbitmq' => {
+              'clustering' => {
+                  'cluster_node_type' => 'disc'
+              }
+          }
+      }
+      chef.add_role('rabbitmq')
+      chef.add_role('rabbitmq_slave')
+    end
   end
 
 end
