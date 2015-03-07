@@ -35,6 +35,24 @@
           },
           "priority" : 0
         }
+      },
+      "clustering" : {
+        "cluster_name" : "seoul_tokyo_newyork",
+        "use_auto_clustering" : false,
+        "cluster_nodes" : [
+          {
+            "name" : "rabbit@rabbit1",
+            "type" : "disc"
+          },
+          {
+            "name" : "rabbit@rabbit2",
+            "type" : "ram"
+          },
+          {
+            "name" : "rabbit@rabbit3",
+            "type" : "disc"
+          }
+        ]
       }
     }
   },

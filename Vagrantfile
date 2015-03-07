@@ -29,7 +29,6 @@ Vagrant.configure('2') do |config|
     rabbit1.vm.provision 'chef_solo' do |chef|
       chef.roles_path = 'roles'
       chef.add_role('rabbitmq')
-      chef.add_role('rabbitmq_master')
     end
   end
 
@@ -39,15 +38,7 @@ Vagrant.configure('2') do |config|
     rabbit2.vm.provision :hostmanager
     rabbit2.vm.provision 'chef_solo' do |chef|
       chef.roles_path = 'roles'
-      chef.json = {
-          'rabbitmq' => {
-              'clustering' => {
-                  'cluster_node_type' => 'ram'
-              }
-          }
-      }
       chef.add_role('rabbitmq')
-      chef.add_role('rabbitmq_slave')
     end
   end
 
@@ -57,15 +48,7 @@ Vagrant.configure('2') do |config|
     rabbit3.vm.provision :hostmanager
     rabbit3.vm.provision 'chef_solo' do |chef|
       chef.roles_path = 'roles'
-      chef.json = {
-          'rabbitmq' => {
-              'clustering' => {
-                  'cluster_node_type' => 'disc'
-              }
-          }
-      }
       chef.add_role('rabbitmq')
-      chef.add_role('rabbitmq_slave')
     end
   end
 
