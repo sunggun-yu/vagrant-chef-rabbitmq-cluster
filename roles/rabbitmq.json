@@ -38,7 +38,7 @@
       },
       "clustering" : {
         "cluster_name" : "seoul_tokyo_newyork",
-        "use_auto_clustering" : false,
+        "use_auto_clustering" : true,
         "cluster_nodes" : [
           {
             "name" : "rabbit@rabbit1",
